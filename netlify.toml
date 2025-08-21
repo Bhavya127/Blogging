@@ -1,0 +1,20 @@
+[build]
+  # The directory where Netlify should run the build command
+  base = "frontend"
+
+  # Command to build your frontend
+  command = "npm install && npm run build"
+
+  # Directory to publish
+  publish = "frontend/dist"
+
+[dev]
+  # Optional: for local Netlify dev server
+  port = 3000
+  publish = "frontend/dist"
+
+# Optional: redirect all paths to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
