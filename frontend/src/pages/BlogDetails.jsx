@@ -10,7 +10,7 @@ export default function BlogDetails() {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/blogs/${id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`);
         const data = await res.json();
 
         const blocks = data.content.map((block) => ({
@@ -28,7 +28,7 @@ export default function BlogDetails() {
 
     const fetchOtherBlogs = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/getblogs`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/getblogs`);
         const data = await res.json();
         // Exclude current blog
         setOtherBlogs(data.filter((b) => b._id !== id));

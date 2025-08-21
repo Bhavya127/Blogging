@@ -8,7 +8,7 @@ const BlogList = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/getblogs");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/getblogs`);
         const data = await res.json();
         setBlogs(data);
       } catch (err) {

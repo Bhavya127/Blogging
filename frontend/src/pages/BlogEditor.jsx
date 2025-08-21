@@ -56,7 +56,7 @@ export default function BlogEditor() {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload-image", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-image`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // send admin token
@@ -76,7 +76,7 @@ export default function BlogEditor() {
 
   const handleUpload = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/blogs", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
