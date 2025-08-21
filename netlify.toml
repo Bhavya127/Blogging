@@ -6,7 +6,7 @@
   command = "npm install && npm run build"
 
   # Directory to publish
-  publish = "frontend/dist"
+  publish = "/dist"
 
 [dev]
   # Optional: for local Netlify dev server
