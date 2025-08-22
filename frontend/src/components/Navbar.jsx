@@ -39,7 +39,7 @@ export default function Navbar() {
           to="/"
           className="text-2xl font-bold tracking-wide hover:text-gray-300 transition-colors duration-200"
         >
-          BoundlessMinds
+          TheLibraryBlogs
         </Link>
 
         {/* Navigation Links */}
