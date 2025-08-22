@@ -1,60 +1,36 @@
 // src/pages/Contact.jsx
-import React, { useState } from "react";
+import React from "react";
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Message sent! We'll get back to you soon.");
-    setFormData({ name: "", email: "", message: "" });
-  };
-
   return (
-    <div className="max-w-2xl mx-auto p-8">
+    <div className="max-w-3xl mx-auto p-10">
       <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
       <p className="text-lg mb-6">
-        We’d love to hear from you! Fill out the form below or email us directly at <span className="font-semibold">contact@boundlessminds.com</span>.
+        We’d love to hear from you! Whether you have a question, feedback,
+        partnership opportunity, or just want to say hello, we’re always happy
+        to connect.  
       </p>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Your Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-2"
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Your Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-2"
-          required
-        />
-        <textarea
-          name="message"
-          placeholder="Your Message"
-          value={formData.message}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-2"
-          rows="5"
-          required
-        ></textarea>
-        <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
+
+      <p className="text-lg mb-6">
+        The best way to reach us is via email. Drop us a message and our team
+        will get back to you as soon as possible. We usually respond within{" "}
+        <span className="font-semibold">24–48 hours</span>.
+      </p>
+
+      <div className="bg-gray-100 p-6 rounded-xl shadow-md">
+        <p className="text-xl font-semibold mb-2">📧 Email Us</p>
+        <a
+          href="mailto:contact@boundlessminds.com"
+          className="text-blue-600 hover:underline text-lg"
         >
-          Send Message
-        </button>
-      </form>
+          contact@thelibraryblogs.com
+        </a>
+      </div>
+
+      <p className="text-lg mt-8">
+        Thank you for visiting our website. We look forward to hearing from you
+        and will do our best to assist you with any queries.
+      </p>
     </div>
   );
 }
