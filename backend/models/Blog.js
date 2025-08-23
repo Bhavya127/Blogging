@@ -10,6 +10,8 @@ const blogSchema = new mongoose.Schema(
     title: { type: String, required: true },
     content: [blockSchema],  // array of blocks
     author: { type: String, default: "Bhavya Patel" },
+     metaDescription: { type: String, maxlength: 160 }, // optional, custom description
+    slug: { type: String, unique: true, required: true }, // SEO-friendly URL
     createdAt: { type: Date, default: Date.now }
   },
   { versionKey: false }

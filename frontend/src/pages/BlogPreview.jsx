@@ -7,7 +7,8 @@ export default function BlogPreview() {
   const location = useLocation();
 
   // fallback to empty values if no state is passed
-  const { title = "", blocks = [] } = location.state || {};
+const { title = "", blocks = [], slug = "", metaDescription = "" } = location.state || {};
+
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
@@ -31,7 +32,7 @@ export default function BlogPreview() {
 
       <button
         onClick={() =>
-          navigate("/blogeditor", { state: { title, blocks } })
+          navigate("/blogeditor", { state: { title, blocks, slug, metaDescription } })
         }
         className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
       >

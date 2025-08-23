@@ -4,32 +4,38 @@ import { useNavigate, useLocation } from "react-router-dom";
 export default function BlogEditor() {
   const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState([{ paragraph: "", images: [""] }]);
+  const [metaDescription, setMetaDescription] = useState(""); // new field
+  const [slug, setSlug] = useState(""); // new field for slug
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get admin token from localStorage
   const token = localStorage.getItem("adminToken");
 
-  // Load draft or pre-filled data
   useEffect(() => {
     if (location.state) {
-      const { title, blocks } = location.state;
+      const { title, blocks, metaDescription, slug } = location.state;
       setTitle(title);
       setBlocks(blocks);
+      setMetaDescription(metaDescription || "");
+      setSlug(slug || "");
     } else {
       const draft = localStorage.getItem("blogDraft");
       if (draft) {
-        const { title, blocks } = JSON.parse(draft);
+        const { title, blocks, metaDescription, slug } = JSON.parse(draft);
         setTitle(title);
         setBlocks(blocks);
+        setMetaDescription(metaDescription || "");
+        setSlug(slug || "");
       }
     }
   }, [location.state]);
 
-  // Save draft to localStorage
   useEffect(() => {
-    localStorage.setItem("blogDraft", JSON.stringify({ title, blocks }));
-  }, [title, blocks]);
+    localStorage.setItem(
+      "blogDraft",
+      JSON.stringify({ title, blocks, metaDescription, slug })
+    );
+  }, [title, blocks, metaDescription, slug]);
 
   const handleBlockChange = (blockIdx, field, value, imgIdx = null) => {
     const newBlocks = [...blocks];
@@ -59,7 +65,7 @@ export default function BlogEditor() {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-image`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // send admin token
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -72,48 +78,76 @@ export default function BlogEditor() {
     }
   };
 
-  const handlePreview = () => navigate("/blog-preview", { state: { title, blocks } });
+  const handlePreview = () =>
+    navigate("/blog-preview", { state: { title, blocks, metaDescription, slug } });
 
   const handleUpload = async () => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // send admin token
-        },
-        body: JSON.stringify({ title, blocks }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ Blog uploaded successfully!");
-        setTitle("");
-        setBlocks([{ paragraph: "", images: [""] }]);
-        localStorage.removeItem("blogDraft");
-      } else alert("❌ Upload failed: " + (data.error || "Unknown error"));
-    } catch (err) {
-      console.error(err);
-      alert("⚠️ Error uploading blog");
-    }
-  };
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, blocks, metaDescription, slug }), // <-- sending both
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("✅ Blog uploaded successfully!");
+      setTitle("");
+      setBlocks([{ paragraph: "", images: [""] }]);
+      setMetaDescription("");
+      setSlug("");
+      localStorage.removeItem("blogDraft");
+    } else alert("❌ Upload failed: " + (data.error || "Unknown error"));
+  } catch (err) {
+    console.error(err);
+    alert("⚠️ Error uploading blog");
+  }
+};
+
 
   return (
     <div className="p-6 md:p-12 bg-gray-50 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8 md:p-12">
-        <h2 className="text-3xl font-extrabold mb-6 text-gray-900 text-center">Create a Blog</h2>
+        <h2 className="text-3xl font-extrabold mb-6 text-gray-900 text-center">
+          Create a Blog
+        </h2>
 
         {/* Blog Title */}
         <input
           type="text"
           placeholder="Enter blog title"
-          className="w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
 
+        {/* Slug */}
+        <input
+          type="text"
+          placeholder="Slug (e.g., top-ai-tools-2025)"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+        />
+
+        {/* Meta Description */}
+        <input
+          type="text"
+          placeholder="Meta description (max 160 chars)"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
+          value={metaDescription}
+          maxLength={160}
+          onChange={(e) => setMetaDescription(e.target.value)}
+        />
+
         {/* Blocks */}
         {blocks.map((block, idx) => (
-          <div key={idx} className="mb-6 border border-gray-200 rounded-xl p-5 bg-gray-50 shadow-sm hover:shadow-md transition-shadow relative">
+          <div
+            key={idx}
+            className="mb-6 border border-gray-200 rounded-xl p-5 bg-gray-50 shadow-sm hover:shadow-md transition-shadow relative"
+          >
             <div className="flex justify-between items-center mb-4">
               <h4 className="font-semibold text-lg">Block {idx + 1}</h4>
               <button
@@ -124,7 +158,6 @@ export default function BlogEditor() {
               </button>
             </div>
 
-            {/* Images */}
             {block.images.map((img, imgIdx) => (
               <div key={imgIdx} className="mb-3 relative">
                 <input
@@ -155,7 +188,6 @@ export default function BlogEditor() {
               ➕ Add Image
             </button>
 
-            {/* Paragraph */}
             <textarea
               placeholder="Paragraph"
               className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
@@ -173,7 +205,6 @@ export default function BlogEditor() {
           ➕ Add Block
         </button>
 
-        {/* Action Buttons */}
         <div className="flex flex-col md:flex-row gap-4">
           <button
             onClick={handlePreview}

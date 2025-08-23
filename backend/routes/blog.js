@@ -3,6 +3,7 @@ const Blog = require("../models/Blog");
 const multer = require("multer");
 const cloudinary = require("../config/cloudinary");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
+const slugify = require("slugify");
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -28,18 +29,37 @@ router.post("/upload-image", verifyToken, verifyAdmin, upload.single("image"), a
   }
 });
 
-// Save blog (only admin)
 router.post("/blogs", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { title, blocks } = req.body;
-    const newBlog = new Blog({ title, content: blocks });
-    await newBlog.save();
-    res.status(201).json({ message: "Blog saved", blog: newBlog });
+    const { title, blocks, metaDescription, slug } = req.body;
+
+    if (!slug || !title) {
+      return res.status(400).json({ error: "Title and slug required" });
+    }
+
+    // Ensure blocks are in correct format
+    const content = Array.isArray(blocks)
+      ? blocks.map(b => ({ paragraph: b.paragraph || "", images: b.images || [""] }))
+      : [];
+
+    const newBlog = new Blog({
+      title,
+      content,
+      metaDescription,
+      slug
+    });
+
+    const savedBlog = await newBlog.save();
+
+    res.status(201).json({ message: "Blog saved", blog: savedBlog });
   } catch (err) {
-    console.error(err);
+    console.error("Error saving blog:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 // Get all blogs (public)
 router.get("/getblogs", async (req, res) => {
@@ -53,9 +73,9 @@ router.get("/getblogs", async (req, res) => {
 });
 
 // Get single blog by ID (public)
-router.get("/blogs/:id", async (req, res) => {
+router.get("/blogs/:slug", async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findOne({ slug: req.params.slug });
     if (!blog) return res.status(404).json({ error: "Blog not found" });
     res.json(blog);
   } catch (err) {

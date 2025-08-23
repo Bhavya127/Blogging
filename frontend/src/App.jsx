@@ -19,7 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<BlogList />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/blog/:id" element={<BlogDetails />} />
+          <Route path="/blog/:slug" element={<BlogDetails />} />
 
           {/* Protected routes */}
          <Route
