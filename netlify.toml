@@ -3,7 +3,7 @@
   base = "frontend"
 
   # Command to build your frontend
-  command = "npm install --legacy-peer-deps && npm run build"
+  command = "npm install --force && npm run build"
 
   # Directory to publish
   publish = "/dist"
