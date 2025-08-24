@@ -45,7 +45,7 @@ const BlogList = () => {
     <div className="min-h-screen bg-gray-50">
       {/* ✅ SEO for Blog List Page */}
       <Helmet>
-        <title>All Blogs | Bhavya Patel Blog</title>
+        <title>All Blogs</title>
         <meta
           name="description"
           content="Read our latest blogs on coding, technology, AI, and more. Stay updated with insightful articles."
@@ -80,11 +80,15 @@ const BlogList = () => {
                       {blogs[0]?.title || "Featured Post"}
                     </Link>
                   </h2>
-                  <p className="text-xl text-gray-600 mb-10 leading-relaxed">
-                    {blogs[0]?.content?.[0]?.paragraph?.slice(0, 350) ||
-                      "Dive into our latest featured content with insights that will transform your understanding of the topic and provide you with valuable knowledge..."}
-                    ...
-                  </p>
+                  {/* ✅ Render formatted preview safely */}
+                  <div
+                    className="prose prose-lg text-gray-600 mb-10 max-w-none line-clamp-4"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        blogs[0]?.content?.[0]?.paragraph ||
+                        "Dive into our latest featured content...",
+                    }}
+                  />
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                     <Link
                       to={`/blog/${blogs[0]?.slug}`}
@@ -111,7 +115,9 @@ const BlogList = () => {
         {/* Grid of Other Posts */}
         {blogs.length > 1 && (
           <div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-10 text-center">All Posts</h3>
+            <h3 className="text-3xl font-bold text-gray-900 mb-10 text-center">
+              All Posts
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-auto">
               {blogs.slice(1).map((blog) => (
                 <article
@@ -124,9 +130,15 @@ const BlogList = () => {
                         {blog.title}
                       </h4>
                     </Link>
-                    <p className="text-gray-600 leading-relaxed mb-4">
-                      {blog?.content?.[0]?.paragraph?.slice(0, 100) || "Explore this fascinating topic..."}...
-                    </p>
+                    {/* ✅ Render preview with formatting */}
+                    <div
+                      className="prose prose-sm text-gray-600 mb-4 max-w-none line-clamp-3"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          blog?.content?.[0]?.paragraph ||
+                          "Explore this fascinating topic...",
+                      }}
+                    />
                     <Link
                       to={`/blog/${blog.slug}`}
                       className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors duration-200"

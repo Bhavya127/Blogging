@@ -2,8 +2,8 @@
 const mongoose = require("mongoose");
 
 const blockSchema = new mongoose.Schema({
-  paragraph: { type: String, default: "" },
-  images: [{ type: String }] // ✅ array of strings
+  paragraph: { type: String, default: "" }, // will hold HTML now
+  images: [{ type: String }]
 });
 const blogSchema = new mongoose.Schema(
   {

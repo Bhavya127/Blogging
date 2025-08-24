@@ -52,37 +52,50 @@ export default function BlogDetails() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
-
       {/* Dynamic SEO */}
       <Helmet>
-        <title>{blog.title} | Bhavya Patel Blog</title>
-        <meta name="description" content={blog.metaDescription || "Read this amazing blog"} />
+        <title>{blog.title}</title>
+        <meta
+          name="description"
+          content={blog.metaDescription || "Read this amazing blog"}
+        />
       </Helmet>
 
       <h1 className="text-3xl font-bold mb-6">{blog.title}</h1>
 
       {blog.blocks.map((block, idx) => (
-        <div key={idx} className="mb-6">
+        <div key={idx} className="mb-8">
+          {/* ✅ Render images */}
           {block.images.map((img, imgIdx) => (
             <img
               key={imgIdx}
               src={img}
               alt={`Block ${idx + 1} Image ${imgIdx + 1}`}
-              className="w-full mb-2 rounded"
+              className="w-full mb-4 rounded-lg shadow"
             />
           ))}
-          <p className="text-lg">{block.paragraph}</p>
+
+          {/* ✅ Render formatted content with HTML support */}
+          {block.paragraph && (
+            <div
+              className="prose prose-lg max-w-none text-gray-800 text-justify"
+              dangerouslySetInnerHTML={{ __html: block.paragraph }}
+            />
+          )}
         </div>
       ))}
 
       {/* Other Blogs */}
       {otherBlogs.length > 0 && (
-        <div className="mt-10">
+        <div className="mt-12 border-t pt-8">
           <h2 className="text-2xl font-semibold mb-4">Other Blogs You Might Like</h2>
           <ul className="space-y-2">
             {otherBlogs.map((b) => (
               <li key={b._id}>
-                <Link to={`/blog/${b.slug}`} className="text-blue-600 hover:underline">
+                <Link
+                  to={`/blog/${b.slug}`}
+                  className="text-blue-600 hover:underline"
+                >
                   {b.title}
                 </Link>
               </li>

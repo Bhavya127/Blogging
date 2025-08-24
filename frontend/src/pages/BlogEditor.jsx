@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 export default function BlogEditor() {
   const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState([{ paragraph: "", images: [""] }]);
-  const [metaDescription, setMetaDescription] = useState(""); // new field
-  const [slug, setSlug] = useState(""); // new field for slug
+  const [metaDescription, setMetaDescription] = useState("");
+  const [slug, setSlug] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,12 +42,15 @@ export default function BlogEditor() {
   const handleBlockChange = (blockIdx, field, value, imgIdx = null) => {
     const newBlocks = [...blocks];
     if (field === "paragraph") newBlocks[blockIdx].paragraph = value;
-    else if (field === "image" && imgIdx !== null) newBlocks[blockIdx].images[imgIdx] = value;
+    else if (field === "image" && imgIdx !== null)
+      newBlocks[blockIdx].images[imgIdx] = value;
     setBlocks(newBlocks);
   };
 
-  const addBlock = () => setBlocks([...blocks, { paragraph: "", images: [""] }]);
-  const removeBlock = (idx) => setBlocks(blocks.filter((_, i) => i !== idx));
+  const addBlock = () =>
+    setBlocks([...blocks, { paragraph: "", images: [""] }]);
+  const removeBlock = (idx) =>
+    setBlocks(blocks.filter((_, i) => i !== idx));
   const addImage = (blockIdx) => {
     const newBlocks = [...blocks];
     newBlocks[blockIdx].images.push("");
@@ -53,7 +58,9 @@ export default function BlogEditor() {
   };
   const removeImage = (blockIdx, imgIdx) => {
     const newBlocks = [...blocks];
-    newBlocks[blockIdx].images = newBlocks[blockIdx].images.filter((_, i) => i !== imgIdx);
+    newBlocks[blockIdx].images = newBlocks[blockIdx].images.filter(
+      (_, i) => i !== imgIdx
+    );
     setBlocks(newBlocks);
   };
 
@@ -62,13 +69,16 @@ export default function BlogEditor() {
     formData.append("image", file);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/upload-image`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/upload-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
       const data = await res.json();
       if (data.url) handleBlockChange(blockIdx, "image", data.url, imgIdx);
       else alert("❌ Failed to upload image: " + (data.error || "Unknown error"));
@@ -82,30 +92,57 @@ export default function BlogEditor() {
     navigate("/blog-preview", { state: { title, blocks, metaDescription, slug } });
 
   const handleUpload = async () => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ title, blocks, metaDescription, slug }), // <-- sending both
-    });
-    const data = await res.json();
-    if (res.ok) {
-      alert("✅ Blog uploaded successfully!");
-      setTitle("");
-      setBlocks([{ paragraph: "", images: [""] }]);
-      setMetaDescription("");
-      setSlug("");
-      localStorage.removeItem("blogDraft");
-    } else alert("❌ Upload failed: " + (data.error || "Unknown error"));
-  } catch (err) {
-    console.error(err);
-    alert("⚠️ Error uploading blog");
-  }
-};
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/blogs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title, blocks, metaDescription, slug }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ Blog uploaded successfully!");
+        setTitle("");
+        setBlocks([{ paragraph: "", images: [""] }]);
+        setMetaDescription("");
+        setSlug("");
+        localStorage.removeItem("blogDraft");
+      } else
+        alert("❌ Upload failed: " + (data.error || "Unknown error"));
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Error uploading blog");
+    }
+  };
 
+  // Quill toolbar config
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "blockquote", "code-block"],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "list",
+    "bullet",
+    "link",
+    "blockquote",
+    "code-block",
+  ];
 
   return (
     <div className="p-6 md:p-12 bg-gray-50 min-h-screen">
@@ -118,7 +155,7 @@ export default function BlogEditor() {
         <input
           type="text"
           placeholder="Enter blog title"
-          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -127,7 +164,7 @@ export default function BlogEditor() {
         <input
           type="text"
           placeholder="Slug (e.g., top-ai-tools-2025)"
-          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
         />
@@ -136,7 +173,7 @@ export default function BlogEditor() {
         <input
           type="text"
           placeholder="Meta description (max 160 chars)"
-          className="w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
+          className="w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700"
           value={metaDescription}
           maxLength={160}
           onChange={(e) => setMetaDescription(e.target.value)}
@@ -165,12 +202,16 @@ export default function BlogEditor() {
                   placeholder={`Image URL ${imgIdx + 1}`}
                   className="w-full border border-gray-300 rounded-xl p-2 mb-2 focus:outline-none focus:ring-1 focus:ring-indigo-400"
                   value={img}
-                  onChange={(e) => handleBlockChange(idx, "image", e.target.value, imgIdx)}
+                  onChange={(e) =>
+                    handleBlockChange(idx, "image", e.target.value, imgIdx)
+                  }
                 />
                 <input
                   type="file"
                   className="w-full mb-2"
-                  onChange={(e) => handleImageUpload(idx, imgIdx, e.target.files[0])}
+                  onChange={(e) =>
+                    handleImageUpload(idx, imgIdx, e.target.files[0])
+                  }
                 />
                 <button
                   onClick={() => removeImage(idx, imgIdx)}
@@ -188,12 +229,14 @@ export default function BlogEditor() {
               ➕ Add Image
             </button>
 
-            <textarea
-              placeholder="Paragraph"
-              className="w-full border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-700"
-              rows="4"
+            {/* Rich Text Editor */}
+            <ReactQuill
+              theme="snow"
               value={block.paragraph}
-              onChange={(e) => handleBlockChange(idx, "paragraph", e.target.value)}
+              onChange={(value) => handleBlockChange(idx, "paragraph", value)}
+              modules={quillModules}
+              formats={quillFormats}
+              className="bg-white rounded-xl"
             />
           </div>
         ))}
