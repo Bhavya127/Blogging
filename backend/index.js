@@ -38,10 +38,10 @@ app.use("/api/admin", adminAuthRoutes);
 
 // ✅ Serve React frontend (build folder)
 app.use(express.static(path.join(__dirname, "client/build")));
-
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/build", "index.html"));
 });
+
 
 // ✅ Start server
 app.listen(process.env.PORT || 5000, () =>
