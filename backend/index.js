@@ -7,13 +7,15 @@ require("dotenv").config();
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+
 // ✅ Prerender middleware
 const prerender = require("prerender-node");
 prerender.set("prerenderToken", process.env.PRERENDER_TOKEN); // free account token
 app.use(prerender);
 
-app.use(cors());
-app.use(express.json());
+
 
 // MongoDB connect
 mongoose
