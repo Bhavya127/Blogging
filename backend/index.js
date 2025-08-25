@@ -10,12 +10,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Prerender middleware
+// ✅ Prerender middleware (only for frontend routes, not API)
 const prerender = require("prerender-node");
-prerender.set("prerenderToken", process.env.PRERENDER_TOKEN); // free account token
-app.use(prerender);
+prerender.set("prerenderToken", process.env.PRERENDER_TOKEN);
 
-
+// Apply prerender ONLY to non-API routes
+app.use((req, res, next) => {
+  if (req.url.startsWith("/api")) {
+    return next(); // Skip prerender for API calls
+  }
+  prerender(req, res, next);
+});
 
 // MongoDB connect
 mongoose
