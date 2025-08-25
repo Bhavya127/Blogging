@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
 const blogRoutes = require("./routes/blog.js");
 const adminAuthRoutes = require("./routes/auth.js");
 require("dotenv").config();
@@ -14,15 +15,15 @@ app.use(express.json());
 const prerender = require("prerender-node");
 prerender.set("prerenderToken", process.env.PRERENDER_TOKEN);
 
-// Apply prerender ONLY to non-API routes
+// Only run prerender for non-API, non-static routes
 app.use((req, res, next) => {
-  if (req.url.startsWith("/api")) {
-    return next(); // Skip prerender for API calls
+  if (req.url.startsWith("/api") || req.url.startsWith("/static")) {
+    return next();
   }
   prerender(req, res, next);
 });
 
-// MongoDB connect
+// ✅ MongoDB connect
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -31,9 +32,18 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
+// ✅ API routes
 app.use("/api", blogRoutes);
 app.use("/api/admin", adminAuthRoutes);
 
-app.listen(process.env.PORT, () =>
+// ✅ Serve React frontend (build folder)
+app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
+});
+
+// ✅ Start server
+app.listen(process.env.PORT || 5000, () =>
   console.log(`Server running on port ${process.env.PORT}`)
 );
